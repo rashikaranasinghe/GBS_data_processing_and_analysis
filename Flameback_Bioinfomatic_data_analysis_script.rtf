@@ -1,0 +1,395 @@
+{\rtf1\ansi\ansicpg1252\cocoartf2761
+\cocoatextscaling0\cocoaplatform0{\fonttbl\f0\fmodern\fcharset0 Courier;}
+{\colortbl;\red255\green255\blue255;\red26\green26\blue26;\red251\green0\blue7;}
+{\*\expandedcolortbl;;\cssrgb\c13333\c13333\c13333;\cssrgb\c100000\c12195\c0;}
+\margl1440\margr1440\vieww20760\viewh13180\viewkind0
+\deftab720
+\pard\pardeftab720\partightenfactor0
+
+\f0\fs24 \cf2 \expnd0\expndtw0\kerning0
+### This file was created by Rashika W. Ranasinge.\
+### This file contains scripts used in the following paper titled:\
+\'93Cryptic Hybridization Dynamics in a Three-Way Hybrid Zone of Dinopium Flamebacks on a Tropical Island\'94\
+\
+### This file includes the raw Genotype-by-Sequencing (GBS) data processing pipeline, admixture mapping, the construction of a maximum likelihood tree using Treemix, and the generation of a maximum-clade-credibility tree with SNAPP.\
+\
+\
+##################################################################### \
+#################### GBS data processing ############################\
+#####################################################################\
+\
+### NOTES:\
+# I used the custom scripts available at https://doi.org/10.5061/dryad.4j2662g, a resource provided by Irwin et al., (2018)\
+# In the paper *****, we processed three GBS plates. This script includes the data processing for GBS plate 3 only.\
+\
+############ 1. Demultiplexing ###########\
+\
+# Make folders to keep things tidy and clean.\
+mkdir tools\
+mkdir extras\
+mkdir clean_data\
+\
+### Make the list of barcodes and sample name file\
+\
+cat > extras/barcodes_woodpeckers_RR_GBS3.txt\
+-------------------\
+UC20RR08	ACGG\
+UC12RR01	CATCG\
+UC12RR02	TGTGCA\
+UE07RR02	GTACGT\
+UC31RR01	GGTAGCA\
+UE07RR04	AATTGCG\
+UC20RR02	AGAATGCA\
+No_barcode-UF02SS04 	AGTGACAA\
+UD30RR01	TGCT\
+UC28RR01	ATCGA\
+UC30RR03 	TTGACA\
+PJ02SS02	TAGGCT\
+UC20RR01	TCCAGGA\
+NB17SS01	GAATAGCA\
+UC29RR04	CAAGTAGA\
+UC20RR06	CATA\
+UF01SS04	TCGAA\
+UC12RR03	AGCTGA\
+UE09RR01	GGCTAG\
+UC19RR01	TTATGCA\
+UC20RR05	TCAGCAG\
+UF01SS01	ATGAGACA\
+UE09RR02	GCAAGAAT\
+UC28RR02	CGAG\
+UF02SS01	ACCTG\
+UE02RR03	TGGCAA\
+UD10RR02	CATGTA\
+UF01SS03	ATTGGCA\
+UE07RR06	CAGTGCA\
+MI21SF02	TGCCACCA\
+UF01SS02	ACCTACCG\
+UC14RR04	GCTT\
+UE07RR05	CTCAG\
+UC29RR03	CTATCG\
+UE07RR03	ATTCGG\
+UD30RR03	TGGTACA\
+UC20RR04	GTACCGA\
+UE09RR03	ATAGAGCA\
+MI10SS06	CTACCACG\
+MH23SF02	ATCA\
+UC27RR01	CGCTA\
+PH24RWR04	GCTGAA\
+UC14RR03	TGACCT\
+UE01RR03	GACCTCA\
+UF03RR02	TGTAACG\
+UD30RR02	ACTCGCCA\
+UE01RR04	GACG\
+UC20RR07	CCTGA\
+UC14RR01	TTCCGA\
+UC19RR03	GCTACT\
+UC29RR02	TGTGCCA\
+UD30RR04	TACGATA\
+UD23RR01	AGCAGTAA\
+MH29SF01	CTGT\
+UC26RR01	CGACT\
+UC27RR02	GACTCT\
+UD16RR01	TCGGTA\
+NC23SS03	TAGACCG\
+UE01RR01	GTAAGCG\
+UF02SS04	GATACGAA\
+MH29SF03	GAACTGAA\
+UC29RR01	TCAA\
+UC20RR03	ACGCT\
+UC14RR02	ATGGCG\
+UE02RR02	CTGAGG\
+UE07RR01	GGATTCA\
+UF01SS05	ATGCAAT\
+PH24RWR01	GCACCTCA\
+UF02SS02	ACTCCACG\
+UF02SS03	AGTCA\
+NC23SS01	GCCAT\
+MI21SF01	TCATGG\
+UC31RR02	GCCTTA\
+PD02RWR02	GATCCAA\
+UC30RR02	CCGGTAA\
+MH29SF05	CACTGCCA\
+UF03RR01	GAAGACAT\
+UC19RR02	TCACG\
+PD02RWR01	CACGT\
+PG25SS01	CATCCG\
+QF16SS01	CGATGT\
+UC30RR01	CTGGACA\
+QI05SS01	AGCTCCG\
+UC19RR04	ACGATGAA\
+MI21SF03	CGGTATGT\
+PG17RWR01	CTGCA\
+UC30RR04	GTTCCA\
+MD19SS01	CCGTCA\
+MF11SS02	GATTACA\
+UE01RR02	AGACTCG\
+no_DNA_Blank	AATGGACA\
+PC07SS01	CGCACACT\
+UE02RR01	TCCGCACA\
+--------ctrl+D-----------\
+\
+\
+## Demultiplex the data\
+# For this, we utilized the custom Perl script used in Irwin et al. (2018) (GBS_demultiplexer_30base.pl) which is remained as GBS_demultiplexer_LN_RR.pl here.\
+\
+screen -S demultiplex\
+\pard\pardeftab720\partightenfactor0
+\cf3 perl tools/GBS_demultiplexer_LN_RR.pl extras/barcodes_woodpeckers_RR_GBS3.txt rawGBSreads/****.fastq rawGBSreads/**.fastq clean_data/GBS5\cf2 \
+\
+\
+\
+############ 2. Trimming ###########\
+\
+# make a directory to save trimmed data\
+mkdir clean_data_trim/\
+\
+# make a list of individuals\
+awk '\{print "GBS3_\'94$1\}' extras/barcodes_woodpeckers_RR_GBS3.txt > extras/prefix.list.woodpeckers_RR_GBS3.bwa\
+\
+# make the trimming script\
+\
+cat > trim_GBS3.sh\
+-------------------\
+#!/bin/bash\
+#script to trim data with trimmomatic\
+#usage ./trim_GBS3.sh\
+\
+while read prefix\
+\
+do\
+\
+java -jar tools/Trimmomatic-0.32/trimmomatic-0.32.jar PE -phred33 -threads 1 clean_data/"$prefix"_R1.fastq clean_data/"$prefix"_R2.fastq clean_data_trim/"$prefix"_R1.fastq clean_data_trim/"$prefix"_R1_unpaired.fastq clean_data_trim/"$prefix"_R2.fastq clean_data_trim/"$prefix"_R2_unpaired.fastq TRAILING:3 SLIDINGWINDOW:4:10 MINLEN:30\
+\
+done < eextras/prefix.list.woodpeckers_RR_GBS3.bwa\
+---------ctrl+D-----------\
+\
+chmod 755 trim_GBS3.sh # to make the script executable \
+screen -r Trimming\
+./trim_GBS3.sh # to run the script \
+\
+\
+############ 3. Align the sequence data to a reference genome ###########\
+\
+# align the reads to the Downy woodpecker (Picoides pubescens) reference genome (NCBI Assembly: https://www.ncbi.nlm.nih.gov/assembly/GCA_014839835.1). \
+# To expedite alignment, subset the sample list and run the alignment separately for each subset.\
+\
+# make the necessary directories to save output files \
+\
+mkdir sam_2022\
+mkdir bam_2022\
+mkdir logs_2022\
+ \
+# Index the reference genome \
+bwa index ref/GCA_014839835.1_bDryPub1.pri_genomic.fa \
+samtools faidx ref/GCA_014839835.1_bDryPub1.pri_genomic.fa\
+\
+\
+# Make the aligning script \
+cat > Downy_chrom_align.2022.sh   #then paste text below  (ctrl-d to finish)\
+-----------\
+#!/bin/bash\
+#script to align data with bwa, combine se and pe data with samtools and add RG for GATK\
+# make sure these folders exist\
+clean_data="clean_data_trim"\
+sam="sam_2022"\
+bam="bam_2022"\
+log="logs_2022"\
+\
+lane="woodpeckers_LN_RR"  \
+runbarcode="woodpeckers_LN_RR" \
+\
+\
+# tell it where the executables are\
+bwa="/Linux/bin/bwa-0.7.10"\
+picard="tools/picard-tools-1.97"\
+samtools="/Linux/bin/samtools"\
+\
+while read prefix\
+do\
+\
+## run bwa\
+$bwa mem -M ref/GCA_014839835.1_bDryPub1.pri_genomic.fa $clean_data/"$prefix"_R1.fastq $clean_data/"$prefix"_R2.fastq > $sam/"$prefix".sam\
+$bwa mem -M ref/GCA_014839835.1_bDryPub1.pri_genomic.fa $clean_data/"$prefix"_R1_unpaired.fastq > $sam/"$prefix".R1.unpaired.sam\
+$bwa mem -M ref/GCA_014839835.1_bDryPub1.pri_genomic.fa $clean_data/"$prefix"_R2_unpaired.fastq > $sam/"$prefix".R2.unpaired.sam\
+\
+## add read group headers, convert to bam, sort and index\
+java -Xmx2g -jar $picard/AddOrReplaceReadGroups.jar I=$sam/"$prefix".sam O=$bam/"$prefix".bam RGID=$lane RGPL=ILLUMINA RGLB=LIB."$prefix" RGSM="$prefix" RGPU=$runbarcode SORT_ORDER=coordinate CREATE_INDEX=TRUE\
+java -Xmx2g -jar $picard/AddOrReplaceReadGroups.jar I=$sam/"$prefix".R1.unpaired.sam O=$bam/"$prefix".R1.unpaired.bam RGID=$lane RGPL=ILLUMINA RGLB=LIB."$prefix" RGSM="$prefix" RGPU=$runbarcode SORT_ORDER=coordinate CREATE_INDEX=TRUE\
+java -Xmx2g -jar $picard/AddOrReplaceReadGroups.jar I=$sam/"$prefix".R2.unpaired.sam O=$bam/"$prefix".R2.unpaired.bam RGID=$lane RGPL=ILLUMINA RGLB=LIB."$prefix" RGSM="$prefix" RGPU=$runbarcode SORT_ORDER=coordinate CREATE_INDEX=TRUE\
+\
+## merge se and pe bam files with samtools and index\
+$samtools merge $bam/"$prefix".combo.bam $bam/"$prefix".bam $bam/"$prefix".R1.unpaired.bam $bam/"$prefix".R2.unpaired.bam\
+$samtools index $bam/"$prefix".combo.bam\
+\
+done < extras/prefix.list.woodpeckers_RR_GBS3.bwa\
+-----ctrl+D------\
+\
+screen -S DW_chrom_aligning	 #open a new screen\
+chmod 755 Downy_chrom_align.2022.sh 		# make executable\
+./Downy_chrom_align.2022.sh				#this runs the script for alignment\
+\
+\
+\
+############ 4. Haplotype Calling ###########\
+\
+# To speed up this step, subset the sample list and run the script separately for each subset.\
+\
+## Making .dict file for the reference \
+java -jar tools/picard-tools-1.97/CreateSequenceDictionary.jar REFERENCE= ref/GCA_014839835.1_bDryPub1.pri_genomic.fa OUTPUT= ref/GCA_014839835.1_bDryPub1.pri_genomic.dict\
+\
+## make the necessary directories to save output files \
+mkdir gvcf_DW.chrom_2022 \
+\
+## setting up the script to call the haplotypes \
+\
+cat > call_snp_DW.chrom5.sh \'a0 #then paste text (do necessary changes) \'a0(ctrl D to finish)\
+-----------\
+#!/bin/bash\
+\
+while read prefix\
+do\
+\
+## make gvcfs\
+java -jar /Linux/GATK-3.8/GenomeAnalysisTK.jar -T HaplotypeCaller -R ref/GCA_014839835.1_bDryPub1.pri_genomic.fa -I bam_2022/"$prefix".combo.bam --emitRefConfidence GVCF -o gvcf_DW.chrom_2022/$prefix".g.vcf\
+\
+done < extras/prefix.list.woodpeckers_RR_GBS3.bwa\
+---------------------\
+\
+chmod 755 call_snp_DW.chrom5.sh ## make executable\
+screen -S haplotypecalling  ## to open a new screen. (ctrl+D to close the screen, ctrl+K to kill the screen)\
+./call_snp_DW.chrom5.sh ## to run the above script\
+\
+# combine all the gvcf files to one file\
+# Make new directories for combined samples\
+\
+mkdir combined_DW.chrom_2022_vcfs\
+mkdir combined_DW.chrom_2022_vcfs_logs\
+\
+# Create a prefix list with the samples that need to be combined\
+ls -o gvcf_DW.chrom_2022/*.g.vcf | awk '\{print "--variant "$8\}' > extras/DW_chrom_samples.gvcf.list\
+\
+# combine the files\
+screen -S combine_gvcfs\
+\
+java -jar /Linux/GATK-3.8/GenomeAnalysisTK.jar -T GenotypeGVCFs -R ref/GCA_014839835.1_bDryPub1.pri_genomic.fa  -l INFO -V extras/DW_chrom_samples.gvcf.list -o combined_DW.chrom_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.vcf -log  combined_DW.chrom_2022_vcfs_logs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.log\
+\
+\
+\
+\
+############ 5. Filter the combined vcf file ###########\
+\
+# Remove indels and SNPs with more than two alleles\
+\
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.vcf --remove-indels --max-alleles 2 --recode --recode-INFO-all --out combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic\
+\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+After filtering, kept 150 out of 150 Individuals\
+Outputting VCF file...\
+After filtering, kept 6355209 out of a possible 7691114 Sites\
+Run Time = 2646.00 seconds\
+\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\'97\
+\
+# now filter out some questionable loci using GATK:\
+\
+java -jar /Linux/GATK-3.8/GenomeAnalysisTK.jar -T VariantFiltration -R ref/GCA_014839835.1_bDryPub1.pri_genomic.fa -V combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.recode.vcf --filterExpression "QD < 2.0 || MQ < 40.0 || FS > 60.0 || SOR > 3.0 || ReadPosRankSum < -8.0" --filterName "GATK_rec_filters" --setFilteredGtToNocall -o combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.vcf\
+\
+\
+\
+# The above flags the variants that PASS or don't. Now actually remove the ones that don't:\
+\
+java -jar /Linux/GATK-3.8/GenomeAnalysisTK.jar -T SelectVariants -R ref/GCA_014839835.1_bDryPub1.pri_genomic.fa -V combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.vcf --excludeFiltered -o combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.excluded.vcf\
+\
+\
+# Remove sites with more than 60% missing genotypes (note the parameter below is intuition times minus one):\
+\
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.vcf --max-missing 0.4 --mac 3 --recode --recode-INFO-all --out combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3\
+\'97\'97\'97\'97\'97\'97\'97\'97\
+After filtering, kept 150 out of 150 Individuals\
+Outputting VCF file...\
+After filtering, kept 1480521 out of a possible 6355209 Sites\
+Run Time = 846.00 seconds\
+\'97\'97\'97\'97\'97\'97\'97\
+\
+\
+###  filter this file for individual and SNP sites for missing data here.\
+\
+##### Filter out individuals that have missing data >= 70%\
+\
+## get the proportion of missing data for each individual\
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.recode.vcf --missing-indv\
+cat out.imiss\
+\
+# make a list of individuals that have missing data > 70%\
+awk '$5 > 0.7' out.imiss | cut -f1 > ind.70miss.list\
+\
+# remove those individuals from the vcf file\
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.recode.vcf --remove ind.70miss.list --recode --recode-INFO-all --out combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss\
+-------------\
+Excluding individuals in 'exclude' list\
+After filtering, kept 114 out of 150 Individuals\
+Outputting VCF file...\
+After filtering, kept 1480521 out of a possible 1480521 Sites\
+Run Time = 548.00 seconds\
+-------------\
+\
+\
+#### Filter out the SNPs that have missing data >= 30%\
+\
+# quantify the proportion of missing data for each SNP\
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.recode.vcf --missing-site \
+\
+# make a list of SNPs' locations with missing data > 30%\
+cat out.lmiss | awk '$6 > 0.3' | cut -f1,2 >> SNP.30pcnt.miss.list\
+\
+# Filter out the SNPs that has higher missing data \
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.recode.vcf --exclude-positions SNP.30pcnt.miss.list --recode --recode-INFO-all --out combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.SNP30miss\
+-------------\
+After filtering, kept 114 out of 114 Individuals\
+Outputting VCF file...\
+After filtering, kept 1251422 out of a possible 1480521 Sites\
+Run Time = 451.00 seconds\
+------------\
+\
+# Convert to tab file in 012NA format (run two commands below):\
+vcftools --vcf combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.SNP30miss.recode.vcf --012 --out combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.SNP30miss.tab\
+---------------\
+After filtering, kept 114 out of 114 Individuals\
+Writing 012 matrix files ... Done.\
+After filtering, kept 1251422 out of a possible 1251422 Sites\
+Run Time = 38.00 seconds\
+----------------\
+\
+cat combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.SNP30miss.tab.012 | sed 's/-1/NA/g' >  combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.SNP30miss.tab.012NA\
+\
+\
+## Above lines will produce 3 files (*.012NA, *.indv, and *.pos files) which we will then import into R and analyze further\
+\
+#type this on the terminal of your computer. This will import .tab file into 012NA_file folder in your computer\
+\
+scp ranasinghe@files.zoology.ubc.ca:flex/DinopiumGBS/combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.noIndels_biallelic.GATKfiltered.maxmiss60.mac3.70pcntIndMiss.SNP30miss.tab.012* /Users/rashikaranasinghe/Documents/Dinopium_GBS_on_laptop/012NA_150_samples\
+\
+\
+# The remaining analyses were performed in RStudio. Please refer to Flameback_GBS_analysis_script.R.\
+\
+##################################################################### \
+################ END GBS data processing ############################\
+#####################################################################\
+\
+\
+\
+##################################################################### \
+###################### Admixture mapping ############################\
+#####################################################################\
+\
+##################################################################### \
+################### END Admixture mapping ###########################\
+#####################################################################\
+\
+\
+### This file includes the raw Genotype-by-Sequencing (GBS) data processing pipeline, admixture mapping, the construction of a maximum likelihood tree using Treemix, and the generation of a maximum-clade-credibility tree with SNAPP.\
+\cf3 \
+\
+\
+\
+\
+\
+}
