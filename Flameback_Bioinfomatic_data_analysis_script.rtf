@@ -295,7 +295,199 @@ scp ranasinghe@files.zoology.ubc.ca:flex/DinopiumGBS/combined_DW.chrom_150.N_202
 ##################################################################### \
 ###################### Admixture mapping ############################\
 #####################################################################\
-\
+# This pipeline is utilized to analyze the genomic ancestry of each individual by calculating admixture proportions using ADMIXTURE 1.3.0 (Alexander & Lange, 2011).
+
+### Filter individuals and SNPs #####
+
+### make the list of individuals that should be included in the PCA  (n=108)
+cat > extras/PCA.Dino.ind.108.list
+----------------------
+woodpeckers_LN_RR_MD18SS03_Dino_R
+woodpeckers_LN_RR_MH29SF02_Dino_H
+woodpeckers_LN_RR_MH31SF01_Dino_R
+woodpeckers_LN_RR_MH31SF02_Dino_R
+woodpeckers_LN_RR_MI05SF04_Dino_R
+woodpeckers_LN_RR_MI10SS01_Dino_Y
+woodpeckers_LN_RR_MI10SS04_Dino_Y
+woodpeckers_LN_RR_MI11SS01_Dino_Y
+woodpeckers_LN_RR_MI19SF01_Dino_R
+woodpeckers_LN_RR_MI19SF04_Dino_R
+woodpeckers_LN_RR_MK13SF02_Dino_R
+woodpeckers_LN_RR_MK13SF03_Dino_R
+woodpeckers_LN_RR_MK13SF04_Dino_R
+woodpeckers_LN_RR_MK14SF01_Dino_R
+woodpeckers_LN_RR_NC23SS02_Dino_Y
+woodpeckers_LN_RR_PC06SS01_Dino_H
+woodpeckers_LN_RR_PD02RWR02_Dino_Y
+woodpeckers_LN_RR_PH24RWR02_Dino_R
+woodpeckers_LN_RR__Dino_MF11SS01
+woodpeckers_LN_RR__Dino_MG11SF01
+woodpeckers_LN_RR__Dino_MG28SF01
+woodpeckers_LN_RR__Dino_MH23SF01
+woodpeckers_LN_RR__Dino_MH29SF04
+woodpeckers_LN_RR__Dino_MH29SF06
+woodpeckers_LN_RR__Dino_MI05SF03
+woodpeckers_LN_RR__Dino_MI10SS02
+woodpeckers_LN_RR__Dino_MI19SF03
+woodpeckers_LN_RR__Dino_MI21SF04
+woodpeckers_LN_RR__Dino_NC15SS01
+woodpeckers_LN_RR__Dino_NC22SS01
+woodpeckers_LN_RR__Dino_PD01RWR01
+woodpeckers_LN_RR__Dino_PH24RWR01
+woodpeckers_LN_RR__Dino_PH24RWR03
+woodpeckers_LN_RR__Dino_PI11RWR01
+woodpeckers_LN_RR__Dino_PI11RWR02
+woodpeckers_LN_RR__Dino_PJ02SS01
+woodpeckers_LN_RR__Dino_PJ02SS03
+woodpeckers_LN_RR__Dino_QI05SS02
+woodpeckers_LN_RR__Dino_QI05SS03
+woodpeckers_LN_RR__Dino_QJ14SS01
+woodpeckers_LN_RR__Dino_QJ14SS02
+woodpeckers_RR_GBS3_MH29SF01
+woodpeckers_RR_GBS3_MI21SF01
+woodpeckers_RR_GBS3_NB17SS01
+woodpeckers_RR_GBS3_NC23SS01
+woodpeckers_RR_GBS3_QI05SS01
+woodpeckers_RR_GBS3_UC12RR01
+woodpeckers_RR_GBS3_UC12RR02
+woodpeckers_RR_GBS3_UC12RR03
+woodpeckers_RR_GBS3_UC14RR04
+woodpeckers_RR_GBS3_UC19RR01
+woodpeckers_RR_GBS3_UC19RR02
+woodpeckers_RR_GBS3_UC19RR03
+woodpeckers_RR_GBS3_UC19RR04
+woodpeckers_RR_GBS3_UC20RR01
+woodpeckers_RR_GBS3_UC20RR02
+woodpeckers_RR_GBS3_UC20RR03
+woodpeckers_RR_GBS3_UC20RR04
+woodpeckers_RR_GBS3_UC20RR05
+woodpeckers_RR_GBS3_UC20RR06
+woodpeckers_RR_GBS3_UC20RR07
+woodpeckers_RR_GBS3_UC26RR01
+woodpeckers_RR_GBS3_UC27RR01
+woodpeckers_RR_GBS3_UC27RR02
+woodpeckers_RR_GBS3_UC28RR01
+woodpeckers_RR_GBS3_UC28RR02
+woodpeckers_RR_GBS3_UC29RR01
+woodpeckers_RR_GBS3_UC29RR02
+woodpeckers_RR_GBS3_UC29RR03
+woodpeckers_RR_GBS3_UC29RR04
+woodpeckers_RR_GBS3_UC30RR01
+woodpeckers_RR_GBS3_UC30RR02
+woodpeckers_RR_GBS3_UC30RR03
+woodpeckers_RR_GBS3_UC30RR04
+woodpeckers_RR_GBS3_UC31RR01
+woodpeckers_RR_GBS3_UC31RR02
+woodpeckers_RR_GBS3_UD16RR01
+woodpeckers_RR_GBS3_UD23RR01
+woodpeckers_RR_GBS3_UD30RR01
+woodpeckers_RR_GBS3_UD30RR02
+woodpeckers_RR_GBS3_UD30RR03
+woodpeckers_RR_GBS3_UD30RR04
+woodpeckers_RR_GBS3_UE01RR01
+woodpeckers_RR_GBS3_UE01RR02
+woodpeckers_RR_GBS3_UE01RR03
+woodpeckers_RR_GBS3_UE01RR04
+woodpeckers_RR_GBS3_UE02RR01
+woodpeckers_RR_GBS3_UE02RR02
+woodpeckers_RR_GBS3_UE02RR03
+woodpeckers_RR_GBS3_UE07RR01
+woodpeckers_RR_GBS3_UE07RR02
+woodpeckers_RR_GBS3_UE07RR03
+woodpeckers_RR_GBS3_UE07RR04
+woodpeckers_RR_GBS3_UE07RR05
+woodpeckers_RR_GBS3_UE09RR01
+woodpeckers_RR_GBS3_UE09RR02
+woodpeckers_RR_GBS3_UE09RR03
+woodpeckers_RR_GBS3_UF01SS01
+woodpeckers_RR_GBS3_UF01SS02
+woodpeckers_RR_GBS3_UF01SS03
+woodpeckers_RR_GBS3_UF01SS04
+woodpeckers_RR_GBS3_UF01SS05
+woodpeckers_RR_GBS3_UF02SS01
+woodpeckers_RR_GBS3_UF02SS02
+woodpeckers_RR_GBS3_UF02SS03
+woodpeckers_RR_GBS3_UF02SS04
+woodpeckers_RR_GBS3_UF03RR01
+woodpeckers_RR_GBS3_UF03RR02
+-----------------------
+
+# Extract the genotype data for the individuals listed above and apply the following filters:
+# I) Exclude inversions and deletions; (--remove-indels)
+# II) Retain only biallelic data; (--min-alleles 2 --max-alleles 2)
+# III) Remove SNPs with more than 60% missing data; (--max-missing 0.4)
+# IV) Keep only high-quality genotype calls; (--minGQ 10)
+# V) Include SNPs with a minor allele count; (--mac 3)
+
+vcftools --vcf ../../combined_DW.chrom_150.N_2022_vcfs/DW.chrom_150.n_Oct.2022.genotypes.variant_only.whole_genome.vcf --keep ../../extras/PCA.Dino.ind.108.list --remove-indels  --min-alleles 2 --max-alleles 2 --max-missing 0.4 --minGQ 10 --mac 3 --recode --out DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3./
+-------------
+After filtering, kept 108 out of 150 Individuals
+Outputting VCF file...
+After filtering, kept 603761 out of a possible 7691114 Sites
+Run Time = 751.00 seconds
+-------------
+
+###### Change the chromosome names 
+cat DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.recode.vcf | sed 's/CM025994.1/1/g;s/CM025995.1/2/g;s/CM025996.1/3/g;s/CM025997.1/4/g;s/CM025998.1/5/g;s/CM025999.1/6/g;s/CM026000.1/7/g;s/CM026001.1/8/g;s/CM026002.1/9/g;s/CM026003.1/10/g;s/CM026004.1/11/g;s/CM026005.1/12/g;s/CM026006.1/13/g;s/CM026007.1/14/g;s/CM026008.1/15/g;s/CM026009.1/16/g;s/CM026010.1/17/g;s/CM026011.1/18/g;s/CM026012.1/19/g;s/CM026013.1/20/g;s/CM026014.1/21/g;s/CM026015.1/22/g;s/CM026016.1/23/g;s/CM026017.1/24/g;s/CM026018.1/25/g;s/CM026019.1/26/g;s/CM026020.1/27/g;s/CM026021.1/28/g;s/CM026022.1/29/g;s/CM026023.1/30/g;s/CM026024.1/31/g;s/CM026025.1/32/g;s/CM026026.1/33/g;s/CM026027.1/34/g;s/CM026028.1/35/g;s/CM026029.1/36/g;s/CM026030.1/37/g;s/CM026031.1/38/g;s/CM026032.1/39/g;s/CM026033.1/40/g;s/CM026034.1/41/g;s/CM026035.1/42/g;s/CM026036.1/43/g;s/CM026037.1/44/g;s/CM026038.1/W/g;s/CM026039.1/Z/g' > DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.chromedited.recode.vcf 
+
+###### Make .bed file
+vcftools --vcf DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.recode.vcf --plink --out DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3
+--------------
+Done.
+After filtering, kept 603761 out of a possible 603761 Sites
+Run Time = 36.00 seconds
+---------------
+
+###### Change the chromosome number in .map file
+perl ../changeid.pl DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.map > DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.new.map
+
+########## Change map file names
+mv DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.map DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.withoutChromEdited.map
+mv DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.new.map DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.map
+
+######## Trim on LD
+/Linux/bin/plink_1.9 --file DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3 --indep-pairwise 50 10 0.1 --allow-no-sex --allow-extra-chr --out DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.LDtrim
+------------------------
+Calculating allele frequencies... done.
+Total genotyping rate is 0.751874.
+603761 variants and 108 people pass filters and QC.
+Note: No phenotypes present.
+Pruned 405019 variants from chromosome 1, leaving 198742.
+Pruning complete.  405019 of 603761 variants removed.
+------------------------
+
+########## Make bed file with pruned SNPs
+/Linux/bin/plink_1.9 --file DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3 --extract DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.LDtrim.prune.in --allow-no-sex --allow-extra-chr 0 --make-bed --out DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.LDtrim
+------------------
+Calculating allele frequencies... done.
+Total genotyping rate is 0.775261.
+198742 variants and 108 people pass filters and QC.
+-------------------
+
+
+############ Run admixture
+cat > admixture_chrom.DW.n108.in.PCA.sh
+——————————
+!#bin/bash
+for K in 2 3 4 5; do ../../ADMIXTURE/tools/admixture_linux-1.3.0/admixture --cv=10 -s time -j10 -C 0.0000000001 DW.chrom_150.n_Nov.2022.wholegenome.variantonlyPCA.108.ind.noIndels.biallelic.maxmiss0.4.minGQ10.mac3.LDtrim.bed $K|tee log${K}.out ;done
+———— ctrl + D 
+
+chmod 755 admixture_chrom.DW.n108.in.PCA.sh
+ screen -S admixture
+./admixture_chrom.DW.n108.in.PCA.sh
+
+
+
+########### Get the K values 
+------------------
+CV error (K=2): 0.48773
+CV error (K=3): 0.50976
+CV error (K=4): 0.53912
+CV error (K=5): 0.57078
+------------------
+
+# Downloaded the output files and visualized the data in R Studio. For details on the data visualization process, please refer to the Flameback_GBS_analysis_script.R script.
+
 ##################################################################### \
 ################### END Admixture mapping ###########################\
 #####################################################################\
