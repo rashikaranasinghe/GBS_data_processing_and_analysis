@@ -492,3 +492,122 @@ CV error (K=5): 0.57078
 ################### END Admixture mapping ###########################\
 #####################################################################\
 
+
+####################################################################################################### 
+################### construction of a maximum likelihood tree using Treemix ###########################
+#######################################################################################################
+
+# Prepare input files
+######## 1. Make the genotype data
+## Filter the genotype data : 
+# I) Exclude inversions and deletions; (--remove-indels)
+# II) Retain only biallelic data; (--min-alleles 2 --max-alleles 2)
+# III) Remove SNPs with more than 80% missing genotype data; (--max-missing 0.8)
+# IV) Keep only high-quality genotype calls; (--minGQ 10)
+# V) Include SNPs with a minor allele count 2; (--mac 2)
+
+vcftools --vcf ../DivergTimeEst.SNP/Dino_only_oneIndperPop/gvcfs_3IndperPop/All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.recode.vcf --remove-indels --min-alleles 2 --max-alleles 2 --max-missing 0.8 --minGQ 10 --mac 2 --recode --out All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.20Prcnt.maxmissing
+-----------------
+After filtering, kept 23 out of 23 Individuals
+Outputting VCF file...
+After filtering, kept 41083 out of a possible 598054 Sites
+Run Time = 8.00 seconds
+----------------------
+
+## impute the remaining missing data 
+java -jar beagle.22Jul22.46e.jar gt=All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.20Prcnt.maxmissing.recode.vcf out=./All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.20Prcnt.maxmissing.recode.vcf.imputed
+
+
+
+######## 2. make the Clust file
+# This file contains information indicating the taxon associated with each sample.
+# The clust file contains three columns, 
+#	> first and the second column indicate the name of the individual/ sample ID
+#	> the third column indicates the taxon name
+
+# I prefer using this code to produce the fist two columns of the clust file 
+bcftools query -l All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.NOmissingdatafiltered.LDpruned.vcf.gz  | awk '{split($1,pop,"."); print $1"\t"$1"\t"pop[2]}'
+
+# Edit the output of above line to make the clust file 
+cat > All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.20Prcnt.maxmissing.recode.vcf.imputed.clust
+----------------------
+GBS4_D.b.benghalense_FMNH_231879	GBS4_D.b.benghalense_FMNH_231879	D.b.benghalense
+GBS4_D.b.benghalense_FMNH_250441	GBS4_D.b.benghalense_FMNH_250441	D.b.benghalense
+GBS4_D.b.benghalense_FMNH_260080	GBS4_D.b.benghalense_FMNH_260080	D.b.benghalense
+GBS4_D.b.dilutum_MCZ_193501	GBS4_D.b.dilutum_MCZ_193501	D.b.dilutum
+GBS4_D.b.dilutum_MCZ_193502	GBS4_D.b.dilutum_MCZ_193502	D.b.dilutum
+GBS4_D.b.dilutum_USNM_483923	GBS4_D.b.dilutum_USNM_483923	D.b.dilutum
+GBS4_D.b.puncticolle_FMNH_231903	GBS4_D.b.puncticolle_FMNH_231903	D.b.puncticolle
+GBS4_D.b.tehminae_USNM_585481	GBS4_D.b.tehminae_USNM_585481	D.b.tehminae
+GBS4_D.b.tehminae_USNM_585484	GBS4_D.b.tehminae_USNM_585484	D.b.tehminae
+GBS5_D.b.puncticolle_FMNH_231915	GBS5_D.b.puncticolle_FMNH_231915	D.b.puncticolle
+GBS5_D.b.puncticolle_USNM_583141	GBS5_D.b.puncticolle_USNM_583141	D.b.puncticolle
+woodpeckers_RR_GBS3_UC14RR02	woodpeckers_RR_GBS3_UC14RR02	C.strickandi
+woodpeckers_RR_GBS3_UC14RR03	woodpeckers_RR_GBS3_UC14RR03	C.strickandi
+woodpeckers_RR_GBS3_UC19RR02	woodpeckers_RR_GBS3_UC19RR02	D.b.jaffnense_M
+woodpeckers_RR_GBS3_UC20RR03	woodpeckers_RR_GBS3_UC20RR03	D.b.jaffnense_M
+woodpeckers_RR_GBS3_UC20RR05	woodpeckers_RR_GBS3_UC20RR05	D.b.jaffnense_M
+woodpeckers_RR_GBS3_UD10RR02	woodpeckers_RR_GBS3_UD10RR02	C.strickandi
+woodpeckers_RR_GBS3_UD30RR01	woodpeckers_RR_GBS3_UD30RR01	D.b.jaffnense_J
+woodpeckers_RR_GBS3_UD30RR03	woodpeckers_RR_GBS3_UD30RR03	D.b.jaffnense_J
+woodpeckers_RR_GBS3_UE01RR01	woodpeckers_RR_GBS3_UE01RR01	D.b.jaffnense_J
+woodpeckers_RR_GBS3_UF01SS02	woodpeckers_RR_GBS3_UF01SS02	D.psarodes
+woodpeckers_RR_GBS3_UF01SS05	woodpeckers_RR_GBS3_UF01SS05	D.psarodes
+woodpeckers_RR_GBS3_UF02SS03	woodpeckers_RR_GBS3_UF02SS03	D.psarodes
+--------ctrl+D---------------------------------------------
+
+## Now convert the vcf tile to treemix allele frequency file. 
+# I used vcf2treemix.sh script created by Joana Meier (see: https://github.com/speciationgenomics/scripts/blob/master/vcf2treemix.sh) with some modifications to convert the vcf file to treemix allele frequency format. 
+./vcf2treemix.sh All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.20Prcnt.maxmissing.recode.vcf.imputed.vcf.gz All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.20Prcnt.maxmissing.recode.vcf.imputed.clust 
+----------------
+Done.
+After filtering, kept 40782 out of a possible 40782 Sites
+Run Time = 1.00 seconds
+---------------------
+
+
+######### Determine the optimum migration edges from the data with OptM
+# First run Treemix with migration events ranging from 1 to 20, performing 10 replicates for each migration value (m).
+
+# For this we need to specify
+#		1. (-i) the input treemix file
+#		2. (-root) population name of the outgroup
+#		3. (-k 500) To account for the nearby SNPS are not independent, group them together in windows of 500SNPs
+#		4. (-m) number of migration events to include (run it with 0 - 5 migration edges)
+#		5. (-bootstrap) generate a single bootstrap replicate by resampling blocks of 500 SNPs
+#		6. (-noss) to turn off the sample size correction (having less number of individuals per pop can lead to overcorrection, this will be prevented with -noss)
+
+# I did not turn off sample size correction. 
+# The value for -k (SNP window size) was chosen to ensure at least 100 windows in the dataset. Given the total of 20,235 SNPs, I calculated 20,235 / 100 = 202.35, and set -k to 200 accordingly
+mkdir OptM
+cd OptM
+cat > treemix.sh
+--------
+for m in {1..20}; do
+        for i in {1..10}; do
+            # Generate random seed
+            s=$RANDOM
+            # Generate bootstrapped input file with ~80% of the SNP loci
+            gunzip -c ../All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.40Prcnt.maxmissing.imputed.LDpruned.treemix.frq.gz | awk 'BEGIN {srand()} { if (NR==1) {print $0} else if (rand() <= .8) print $0}' | gzip > ../All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.40Prcnt.maxmissing.imputed.LDpruned.${i}.${m}.treemix.gz
+            # Run treemix on bootstrapped input file
+            treemix -i ../All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.40Prcnt.maxmissing.imputed.LDpruned.${i}.${m}.treemix.gz -o All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.40Prcnt.maxmissing.imputed.LDpruned.${i}.${m} -global -m ${m} -root C.strickandi -k 200 -seed ${s}
+        done
+    done
+------
+chmod +x treemix.sh
+./treemix.sh
+rm treemix.sh
+cd ../
+
+
+## Downloaded the OptM_II folder and visualized the data in RStudio to determine the optimal number of migration edges.
+# Based on the analysis with OptM, m=1 is the optimum number of migration edges for the data. Therefore make the final tree with a single migration edge with treemix and visualize it with Studio
+treemix -i ../All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.40Prcnt.maxmissing.imputed.LDpruned.treemix.frq.gz -o All.D.benghalense.SL.India_3perPop_except.tehminae.noIndels.biallalic.GBTKfilterExcluded.minGQ10_mac2.40Prcnt.maxmissing.imputed.LDpruned.m1.k200 -global -m 1 --root C.strickandi -k 200
+
+# Please refer to the Flameback_GBS_analysis_script.R for the data analysis and visualization conducted in RStudio
+
+####################################################################################################### 
+################### END construction of a maximum likelihood tree using Treemix #######################
+#######################################################################################################
+
+
